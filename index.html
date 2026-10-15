@@ -45,6 +45,8 @@
     @keyframes heroGlow{from{transform:translate3d(0,0,0) scale(.9);opacity:.55}to{transform:translate3d(70px,-38px,0) scale(1.16);opacity:1}}
     .motion-ready .reveal{opacity:0;transform:translate3d(0,22px,0);transition:opacity .65s ease,transform .65s cubic-bezier(.2,.7,.2,1)}
     .motion-ready .reveal.is-visible{opacity:1;transform:translate3d(0,0,0)}
+    .motion-ready .text-reveal{opacity:0;transform:translate3d(0,10px,0);transition:opacity .48s ease,transform .48s cubic-bezier(.2,.7,.2,1);transition-delay:var(--text-delay,0ms)}
+    .motion-ready .text-reveal.text-visible{opacity:1;transform:translate3d(0,0,0)}
     .motion-ready .lesson-grid .lesson:nth-child(2),.motion-ready .program-grid .program:nth-child(2),.motion-ready .answer-grid .answer-card:nth-child(2){transition-delay:.08s}
     .motion-ready .lesson-grid .lesson:nth-child(3),.motion-ready .program-grid .program:nth-child(3){transition-delay:.16s}
     .lesson,.program,.hero-card,.answer-card,.checklist,.review-line{transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease,background-color .28s ease}
@@ -127,12 +129,20 @@
     const motionPreference=window.matchMedia('(prefers-reduced-motion: reduce)');
     if(!motionPreference.matches&&'IntersectionObserver' in window){
       const motionTargets=document.querySelectorAll('.hero-grid,.section-head,.stat,.lesson,.answer-card,.step,.program,.checklist,.review-line,.support-copy');
+      const textSelector='.section-head h2,.section-head p,.lesson h3,.lesson p,.answer-card summary,.step h3,.step p,.program h3,.program>p,.program li,.review-line b,.support-copy h2,.support-copy p';
+      const textTargets=[...document.querySelectorAll(textSelector)];
+      textTargets.forEach(item=>{
+        item.classList.add('text-reveal');
+        const group=item.closest('.lesson,.answer-card,.step,.program,.review-line,.section-head,.support-copy')||item.parentElement;
+        const sequence=[...group.querySelectorAll(textSelector)];
+        item.style.setProperty('--text-delay',`${Math.min(sequence.indexOf(item),5)*55}ms`);
+      });
       motionTargets.forEach(item=>item.classList.add('reveal'));
       document.documentElement.classList.add('motion-ready');
       const revealObserver=new IntersectionObserver((entries,observer)=>entries.forEach(entry=>{
-        if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target)}
+        if(entry.isIntersecting){entry.target.classList.add(entry.target.classList.contains('text-reveal')?'text-visible':'is-visible');observer.unobserve(entry.target)}
       }),{threshold:.12,rootMargin:'0px 0px -36px 0px'});
-      motionTargets.forEach(item=>revealObserver.observe(item));
+      [...motionTargets,...textTargets].forEach(item=>revealObserver.observe(item));
     }
 
   </script>
