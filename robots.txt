@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://shanmukh-thalabathula.github.io/glimpse-gmr-valorant-guide/sitemap.xml
+
